@@ -6,6 +6,15 @@ unless(node[:dnsmasq][:enable_dhcp])
   dns_config['no-dhcp-interface='] = nil
 end
 
+# Check if config avaliable
+unless ::File.exist?('/etc/dnsmasq.d/dns.conf')
+  service 'dnsmasq' do
+    Chef::Log.error(" /etc/dnsmasq.d/dns.conf not found, resolving is not possible.")
+    action [:stop]
+  end
+end
+
+
 template '/etc/dnsmasq.d/dns.conf' do
   source 'dynamic_config.erb'
   mode 0644
